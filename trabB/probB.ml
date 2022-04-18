@@ -14,15 +14,15 @@ let make_node l v r = Node (l, v, r, 1 + max (height l) (height r))
 
 (** rotates the tree to the right on a specific node (the one thats passed) *)
 let rot_right = function
-  | Leaf -> raise Error "rotation on leaf is not supported"
   | Node (Node (l1, v1, r1, _), v2, r2, _) ->
-      make_node l1 k1 (mknode r1 v2 r2)
+      make_node l1 v1 (make_node r1 v2 r2)
+  | _ -> failwith "rotation on leaf is not supported"
 
 (** same shit but left *)
 let rot_left = function
-  | Leaf -> raise Error "rotation on leaf is not supported"
   | Node (l1, v1, Node (l2, v2, r1, _), _) ->
-      make_node (mknode l1 v1 l2) v2 r1
+      make_node (make_node l1 v1 l2) v2 r1
+  | _ -> failwith "rotation on leaf is not supported"
 
 (** using quick sort (partitioning and pivotal comparison) to sort list *)
 let rec quicksort = function
