@@ -4,27 +4,27 @@ type t =
   | Leaf
   | Node of t * int * t * int (* left node, value, right node, height *)
 
-(** returns height of node lmao *)
+(** retorna a altura do node lmao *)
 let height = function
   | Leaf -> 0
   | Node (_, _, _, h) -> h
 
-(** makes a node in the tree *)
+(** faz um node na arvore *)
 let make_node l v r = Node (l, v, r, 1 + max (height l) (height r))
 
-(** rotates the tree to the right on a specific node (the one thats passed) *)
+(** roda o node para a direita *)
 let rot_right = function
   | Node (Node (l1, v1, r1, _), v2, r2, _) ->
       make_node l1 v1 (make_node r1 v2 r2)
   | _ -> failwith "rotation on leaf is not supported"
 
-(** same shit but left *)
+(** mm merda para a esquerda*)
 let rot_left = function
   | Node (l1, v1, Node (l2, v2, r1, _), _) ->
       make_node (make_node l1 v1 l2) v2 r1
   | _ -> failwith "rotation on leaf is not supported"
 
-(** simple validation of first input *)
+(** validacao simples dos inputs dos elem das arvores*)
 let validate x = if x < 0 || x > 10000 then invalid_arg "Invalid number of elements in tree (0-10000)" else x
 
 (** tail recursive *)
@@ -41,6 +41,7 @@ let num_trees =
   let tmp = read_int () in 
   if tmp < 0 || tmp > 5000 then invalid_arg "Invalid number of trees (0-5000)" else tmp
 
+(** lista de lista dos inputs *)
 let list = num_trees |> make_big_list
 
 let timestart = Sys.time ()
