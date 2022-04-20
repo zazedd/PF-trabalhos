@@ -52,15 +52,17 @@ let num_trees =
   if tmp < 0 || tmp > 5000 then invalid_arg "Invalid number of trees (0-5000)" else tmp
 
 (** lista de lista dos inputs *)
-let list = num_trees |> make_big_list
+let inputlst = num_trees |> make_big_list
 
 let timestart = Sys.time ()
 
-let () = List.iter (Printf.printf "| %d\n") (List.sort_uniq compare (List.nth list 0))
-let () = Printf.printf "\n"
-let () = List.iter (Printf.printf "| %d\n") (List.sort_uniq compare (List.nth list 1))
-let () = Printf.printf "\n"
-let () = List.iter (Printf.printf "| %d\n") (List.sort_uniq compare (List.nth list 2))
+let rec print_lsts = function
+  | [] -> ()
+  | x :: xs -> List.iter (Printf.printf "| %d\n") (List.sort_uniq compare x); 
+               Printf.printf "\n"; 
+               print_lists xs 
+
+let () = print_lsts inputlst
 
 let timeend = Sys.time ()
 
