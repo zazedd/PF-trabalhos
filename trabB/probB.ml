@@ -24,16 +24,15 @@ let rot_left = function
       make_node (make_node l1 v1 l2) v2 r1
   | _ -> failwith "rotation on leaf is not supported"
 
-(** check se contem o valor na arvore 
-METER OS VALORES NUMA HASHTBL/LISTA PARA TER O CAMINHO ATÉ O NUMERO*)
-let rec cont x = function
-  | Leaf -> false
+(** mete os valores dos nodes por onde a funcao andou numa lista ate encontrar o numero pedido x*)
+let rec get_path x = function
   | Node (l, v , r, _) -> begin
       match compare x v with
-      | 0 -> true                   (** está contido *)
-      | result when result > 0 -> cont x r    (** x > v, continuar a procura à direita *)
-      | _ -> cont x l               (** x < v, continuar a procura à esquerda *)
+      | 0 -> [x]                                        (** está contido, acabamos o caminho com o proprio numero*)
+      | result when result > 0 -> v :: get_path x l     (** x < v, continuar a procura à esquerda e acrescentamos o valor do node ao caminho *)
+      | _ -> v :: get_path x r                          (** x > v, continuar a procura à direita e acrescentamos o valor do node ao caminho *)
   end
+  | _ -> []
 
 (** validacao simples dos inputs dos elem das arvores*)
 let validate x = if x < 0 || x > 10000 then invalid_arg "Invalid number of elements in tree (0-10000)" else x
@@ -57,11 +56,11 @@ let list = num_trees |> make_big_list
 
 let timestart = Sys.time ()
 
-let () = List.iter (Printf.printf "| %d\n") (List.fast_sort compare (List.nth list 0))
+let () = List.iter (Printf.printf "| %d\n") (List.sort_uniq compare (List.nth list 0))
 let () = Printf.printf "\n"
-let () = List.iter (Printf.printf "| %d\n") (List.fast_sort compare (List.nth list 1))
+let () = List.iter (Printf.printf "| %d\n") (List.sort_uniq compare (List.nth list 1))
 let () = Printf.printf "\n"
-let () = List.iter (Printf.printf "| %d\n") (List.fast_sort compare (List.nth list 2))
+let () = List.iter (Printf.printf "| %d\n") (List.sort_uniq compare (List.nth list 2))
 
 let timeend = Sys.time ()
 
