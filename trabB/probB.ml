@@ -29,7 +29,7 @@ let rec get_path x = function
   | Node (l, v , r, _) -> begin
       match compare x v with
       | 0 -> [x]                                        (** está contido, acabamos o caminho com o proprio numero*)
-      | result when result > 0 -> v :: get_path x l     (** x < v, continuar a procura à esquerda e acrescentamos o valor do node ao caminho *)
+      | result when result < 0 -> v :: get_path x l     (** x < v, continuar a procura à esquerda e acrescentamos o valor do node ao caminho *)
       | _ -> v :: get_path x r                          (** x > v, continuar a procura à direita e acrescentamos o valor do node ao caminho *)
   end
   | _ -> []
