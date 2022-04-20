@@ -24,7 +24,8 @@ let rot_left = function
       make_node (make_node l1 v1 l2) v2 r1
   | _ -> failwith "rotation on leaf is not supported"
 
-(** check se contem o valor na arvore *)
+(** check se contem o valor na arvore 
+METER OS VALORES NUMA HASHTBL/LISTA PARA TER O CAMINHO ATÉ O NUMERO*)
 let rec cont x = function
   | Leaf -> false
   | Node (l, v , r, _) -> begin
