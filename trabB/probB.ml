@@ -34,8 +34,34 @@ let rec get_path x = function
   end
   | _ -> []
 
-(** validacao simples dos inputs dos elem das arvores*)
-let validate x = if x < 0 || x > 10000 then invalid_arg "Invalid number of elements in tree (0-10000)" else x
+let rec insert x = function
+  | Leaf -> Node (Leaf, x, Leaf, 1) (** caso inicial *)
+  | Node (l, v, r, _) as current -> begin
+      match compare x v with
+      | 0 -> current
+      | result when result < 0 -> begin (** x < v *)
+          match insert x l with
+          | Node (l2, v2, r2, h2) as nextl -> begin
+              match (h2 - height r) <= 1 with
+              | true -> make_node nextl v r
+              | false -> let nextl = if height l2 < height r2 then rot_left nextl
+                         else nextl in
+                         rot_right (make_node nextl v r)
+              end 
+          | Leaf -> failwith "insertion on leaf isn't supported"
+          end
+      | _ -> begin
+          match insert x r with
+          | Node (l2, v2, r2, h2) as nextr -> begin
+              match (h2 - height l) <= 1 with
+              | true -> make_node l v nextr
+              | false -> let nextr = if height l2 < height r2 then rot_right nextr
+                         else nextr in
+                         rot_left (make_node l v nextr)
+              end
+          | Leaf -> failwith "insertion on leaf isn't supported"
+          end
+      end
 
 (** tail recursive *)
 let rec make_list = function
@@ -45,11 +71,9 @@ let rec make_list = function
 (** tail recursive *)
 let rec make_big_list = function 
   | 0 -> []
-  | n -> (validate (read_int ()) |> make_list) :: make_big_list (n - 1)
+  | n -> (read_int () |> make_list) :: make_big_list (n - 1)
 
-let num_trees = 
-  let tmp = read_int () in 
-  if tmp < 0 || tmp > 5000 then invalid_arg "Invalid number of trees (0-5000)" else tmp
+let num_trees = read_int ()
 
 (** lista de lista dos inputs *)
 let inputlst = num_trees |> make_big_list
@@ -60,7 +84,7 @@ let rec print_lsts = function
   | [] -> ()
   | x :: xs -> List.iter (Printf.printf "| %d\n") (List.sort_uniq compare x); 
                Printf.printf "\n"; 
-               print_lists xs 
+               print_lsts xs 
 
 let () = print_lsts inputlst
 
