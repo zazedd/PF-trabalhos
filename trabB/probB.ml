@@ -9,6 +9,8 @@ let height = function
   | Leaf -> 0
   | Node (_, _, _, h) -> h
 
+let empty = Leaf
+
 (** faz um node na arvore *)
 let make_node l v r = Node (l, v, r, 1 + max (height l) (height r))
 
@@ -35,11 +37,11 @@ let rec get_path x = function
   | _ -> []
 
 let rec insert x = function
-  | Leaf -> Node (Leaf, x, Leaf, 1) (** caso inicial *)
+  | Leaf -> Node (Leaf, x, Leaf, 1)                     (** caso inicial *)
   | Node (l, v, r, _) as current -> begin
       match compare x v with
       | 0 -> current
-      | result when result < 0 -> begin (** x < v *)
+      | result when result < 0 -> begin                 (** x < v *)
           match insert x l with
           | Node (l2, v2, r2, h2) as nextl -> begin
               match (h2 - height r) <= 1 with
@@ -50,7 +52,7 @@ let rec insert x = function
               end 
           | Leaf -> failwith "insertion on leaf isn't supported"
           end
-      | _ -> begin
+      | _ -> begin                                      (** x > v *)
           match insert x r with
           | Node (l2, v2, r2, h2) as nextr -> begin
               match (h2 - height l) <= 1 with
@@ -78,16 +80,39 @@ let num_trees = read_int ()
 (** lista de lista dos inputs *)
 let inputlst = num_trees |> make_big_list
 
-let timestart = Sys.time ()
-
 let rec print_lsts = function
   | [] -> ()
   | x :: xs -> List.iter (Printf.printf "| %d\n") (List.sort_uniq compare x); 
                Printf.printf "\n"; 
                print_lsts xs 
 
+let rec make_tree = function
+  | [] -> []
+  | x :: xs -> List.fold_left (fun t a -> insert a t) empty x :: make_tree xs
+
+let tree_lst = make_tree inputlst
+
 let () = print_lsts inputlst
+
+let timestart = Sys.time ()
+
+let () = List.iter (Printf.printf "%d ") (get_path 0 (List.hd tree_lst))
+let () = Printf.printf "\n"
+let () = List.iter (Printf.printf "%d ") (get_path 2 (List.hd tree_lst))
+let () = Printf.printf "\n"
+let () = List.iter (Printf.printf "%d ") (get_path 3 (List.hd tree_lst))
+let () = Printf.printf "\n"
+let () = List.iter (Printf.printf "%d ") (get_path 4 (List.hd tree_lst))
+let () = Printf.printf "\n"
+let () = List.iter (Printf.printf "%d ") (get_path 5 (List.hd tree_lst))
+let () = Printf.printf "\n"
+let () = List.iter (Printf.printf "%d ") (get_path 6 (List.hd tree_lst))
+let () = Printf.printf "\n"
+let () = List.iter (Printf.printf "%d ") (get_path 9 (List.hd tree_lst))
+let () = Printf.printf "\n"
+let () = List.iter (Printf.printf "%d ") (get_path 10 (List.hd tree_lst))
+let () = Printf.printf "\n"
 
 let timeend = Sys.time ()
 
-let () = Printf.printf "%.40f" (timeend -. timestart)
+let () = Printf.printf "%.40f\n" (timeend -. timestart)
