@@ -65,6 +65,8 @@ let rec insert x = function
           end
       end
 
+let remove_from_left xs = List.fold_left (fun xs x -> if List.mem x xs then xs else x :: xs) [] xs
+
 (** tail recursive *)
 let rec make_list = function
   | 0 -> []
@@ -73,16 +75,16 @@ let rec make_list = function
 (** tail recursive *)
 let rec make_big_list = function 
   | 0 -> []
-  | n -> (read_int () |> make_list) :: make_big_list (n - 1)
+  | n -> (List.fast_sort compare (read_int () |> make_list |> remove_from_left) |> List.rev) :: make_big_list (n - 1)
 
 let num_trees = read_int ()
 
 (** lista de lista dos inputs *)
-let inputlst = num_trees |> make_big_list
+let inputlst = num_trees |> make_big_list 
 
 let rec print_lsts = function
   | [] -> ()
-  | x :: xs -> List.iter (Printf.printf "| %d\n") (List.sort_uniq compare x); 
+  | x :: xs -> List.iter (Printf.printf "| %d\n") x; 
                Printf.printf "\n"; 
                print_lsts xs 
 
@@ -90,9 +92,10 @@ let rec make_tree = function
   | [] -> []
   | x :: xs -> List.fold_left (fun t a -> insert a t) empty x :: make_tree xs
 
+let () = print_lsts inputlst
+
 let tree_lst = make_tree inputlst
 
-let () = print_lsts inputlst
 
 let timestart = Sys.time ()
 
@@ -116,5 +119,3 @@ let () = Printf.printf "\n"
 let timeend = Sys.time ()
 
 let () = Printf.printf "%.40f\n" (timeend -. timestart)
-
-(*https://coq.inria.fr/library/Coq.MSets.MSetAVL.html*)
