@@ -111,7 +111,7 @@ let rec assert_balance lst =
 
 
 
-(** FUNCOES DE INPUT/OUTPUT PRINCIPAL*)
+(** FUNCOES DE INPUT/OUTPUT*)
 
 (** Remove valores duplicados de uma lista. Fold_left é tail-rec e por isso ocupa heap-space constante*)
 let remove_dups xs = List.fold_left (fun xs x -> if List.mem x xs then xs else x :: xs) [] xs
@@ -145,14 +145,24 @@ let rec common_mutation a b = function
       match compare (List.hd path1) a with              (** O ultimo elemento do caminho para a mutação1 é igual si mesmo? *)
       | 0 -> begin                                      
         let path2 = get_path b x |> List.rev in
-          match compare (List.hd path2) b with                                              (** O ultimo elemento do caminho para a mutação2 é igual si mesmo? *)
-          | 0 -> (first_common path1 path2 |> string_of_int) :: common_mutation a b xs        (** Se sim, encontramos o primeiro elemento comum nos camingos e inserimos-lo na lista. Continuamos com a proxima árvore *)
-          | _ -> "NO" :: common_mutation a b xs                                               (** Se não, como a mutação2 não está na árvore, metemos "NO" na lista e continuamos com a proxima árvore. *)
+          match compare (List.hd path2) b with                               (** O ultimo elemento do caminho para a mutação2 é igual si mesmo? *)
+          | 0 -> (first_common path1 path2) :: common_mutation a b xs        (** Se sim, encontramos o primeiro elemento comum nos camingos e inserimos-lo na lista. Continuamos com a proxima árvore *)
+          | _ -> common_mutation a b xs                                      (** Se não, como a mutação2 não está na árvore, continuamos com a proxima árvore. *)
       end
-      | _ -> "NO" :: common_mutation a b xs               (** Como a mutação1 não está na árvore, metemos "NO" na lista e continuamos com a proxima arvore. *)
+      | _ -> common_mutation a b xs                     (** Como a mutação1 não está na árvore, continuamos com a proxima arvore. *)
     end
 
-
+(** Reponsável pelo handling do output: 
+* Se nenhuma árvore apresentar mutações comuns mete "NO" no stdout, caso contrario 
+* mete as mutações em comum.
+*)
+let rec print_common_mutations = function
+  | [] -> Printf.printf "NO\n"
+  | x :: xs -> begin
+    match xs with
+    | [] -> Printf.printf "%d\n" x
+    | y :: ys -> Printf.printf "%d\n" x; print_common_mutations xs
+    end
 
 (** CHAMADAS DE FUNCOES*)
 
@@ -169,7 +179,7 @@ let tree_lst = make_tree inputlst
 let () = assert_balance tree_lst
 
 (** Output das mutações em comum *)
-let () = List.iter (Printf.printf "%s\n") (common_mutation mutation1 mutation2 tree_lst)
+let () = print_common_mutations (common_mutation mutation1 mutation2 tree_lst)
 
 
 
