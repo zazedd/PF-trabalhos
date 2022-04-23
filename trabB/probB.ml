@@ -173,7 +173,7 @@ let inputlst = read_int () |> make_big_list
 let (mutation1, mutation2) = Scanf.scanf "%d %d" (fun x y -> (x ,y))
 
 (** Lista das arvores *)
-let tree_lst = make_tree inputlst
+let tree_lst = (make_tree inputlst) |> List.rev
 
 (** Assegura que todas as arvores estão balançadas *)
 let () = assert_balance tree_lst
