@@ -11,10 +11,10 @@ let is_inside lst = List.for_all (fun x -> (x >= 0 && x < square)) lst
 let is_neighbour = function
     | [a; b; c; d] -> begin
         if (a = c && (b = d + 1 || b = d - 1))
-           || (b = d && (a = c + 1 || a = c - 1))
-           then [(a, b); (c, d)]
-           else invalid_arg ("Conditions not set correctly, the coordinates aren't neighbours")
-           end
+        || (b = d && (a = c + 1 || a = c - 1))
+            then [(a, b); (c, d)]
+            else invalid_arg ("Conditions not set correctly, the coordinates aren't neighbours")
+        end
     | _ -> []
 
 let check_ineq_input = function
