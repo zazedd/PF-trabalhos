@@ -27,8 +27,6 @@ let rec ineq_fun = function
     | 0 -> []
     | n -> ((read_line () |> String.split_on_char ' ' |> List.map int_of_string) |> check_ineq_input) :: ineq_fun (n - 1)
 
-let ineq_list = inequalities |> ineq_fun
-
 let rec make_empty_board = function
     | 0 -> []
     | n -> begin
@@ -44,6 +42,8 @@ let rec print_board = function
     | x :: xs -> List.iter (fun y -> Printf.printf "%d " y) x;
                  Printf.printf "\n";
                  print_board xs
+
+let ineq_list = inequalities |> ineq_fun
 
 let board = make_empty_board square
 
