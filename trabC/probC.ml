@@ -2,7 +2,7 @@ open Format
 
 (** INPUT *)
 
-let square = read_int () |> (fun x -> if (x >= 4 && x <= 9) then x else invalid_arg "Board must be from 4x4 to 9x9.")
+let square = read_int () |> (fun x -> if (x >= 4 && x <= 6) then x else invalid_arg "Board must be from 4x4 to 9x9.")
 
 let inequalities = read_int ()
 
@@ -27,24 +27,17 @@ let rec ineq_fun = function
     | 0 -> []
     | n -> ((read_line () |> String.split_on_char ' ' |> List.map int_of_string) |> check_ineq_input) :: ineq_fun (n - 1)
 
-let rec make_empty_board = function
-    | 0 -> []
-    | n -> begin
-        let rec make_empty_line = function
-            | 0 -> []
-            | m -> 0 :: make_empty_line (m - 1)
-            in
-            make_empty_line square :: make_empty_board (n - 1)
-        end
 
-let rec print_board = function
-    | [] -> ()
-    | x :: xs -> List.iter (fun y -> Printf.printf "%d " y) x;
-                 Printf.printf "\n";
-                 print_board xs
+let board = Array.make_matrix square square 0
+
+let print_board arr = Array.iter (fun y -> Array.iter (Printf.printf "%d ") y; print_newline ()) arr
+
+let () = let lin = board.(1) in lin.(2) <- 213
 
 let ineq_list = inequalities |> ineq_fun
 
-let board = make_empty_board square
-
 let () = print_board board
+
+(* let board = make_empty_board square
+
+let () = print_board board *)
