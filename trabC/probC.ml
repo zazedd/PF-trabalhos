@@ -30,14 +30,23 @@ let rec ineq_fun = function
 
 let board = Array.make_matrix square square 0
 
-let print_board arr = Array.iter (fun y -> Array.iter (Printf.printf "%d ") y; print_newline ()) arr
+let () = board.(3).(2) <- 2
+let () = board.(1).(1) <- 2
 
-let () = let lin = board.(1) in lin.(2) <- 213
+
+(** true if safe, false if not *)
+let is_safe num = function
+    | (x, y) -> begin
+        let rec is_safe_col num lin = function
+            | (x, y) -> board.(lin).(y) = num || (if lin - 1 < 0 then false else is_safe_col num (lin - 1) (x, y))
+            in
+        not (Array.exists (fun a -> a = num) board.(x) || is_safe_col num (square - 1) (x, y))
+    end
+ 
+let () = Printf.printf "%B\n" (is_safe 1 (1, 2))
+
+let print_board arr = Array.iter (fun y -> Array.iter (Printf.printf "%d ") y; print_newline ()) arr
 
 let ineq_list = inequalities |> ineq_fun
 
 let () = print_board board
-
-(* let board = make_empty_board square
-
-let () = print_board board *)
