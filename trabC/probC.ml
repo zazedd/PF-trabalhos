@@ -39,20 +39,24 @@ let rec ineq_fun = function
 
 let board = Array.make_matrix square square 0
 
+let allowedpos_lst = make_setlist (upto (square - 1)) (upto (square - 1))
+
 (** d1 -> linhas indisponiveis para um certo numero n
-    d2 -> colunas indisponiveis para um certo numero n *)
+    d2 -> colunas indisponiveis para um certo numero n 
+    let test = make_setlist (S.remove x lin) (S.remove y col) *)
 let rec solve n d1 d2 = function
     | [lin; col] -> begin
                     if n > square then true
                     else
-                        if S.is_empty lin || S.is_empty col then solve (n + 1) S.empty S.empty (make_setlist (upto (square - 1)) (upto (square - 1)))
+                        if S.is_empty lin || S.is_empty col then solve (n + 1) S.empty S.empty allowedpos_lst
                         else
                             let x = S.min_elt (S.diff lin d1) 
                             and y = S.min_elt (S.diff col d2) in
-                            let test = make_setlist (S.remove x lin) (S.remove y col)
+                            let d1 = S.diff lin d1
+                            and d2 = S.diff col d2
                             in
                             board.(x).(y) <- n;
-                            solve n S.empty S.empty test
+                            solve n d1 d2 allowedpos_lst
                 end
                     
     | _ -> assert false
