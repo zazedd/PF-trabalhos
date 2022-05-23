@@ -1,14 +1,6 @@
 open Format
 
-module S = Set.Make(struct type t = int let compare = compare end)
-
-let rec upto n = if n < 0 then S.empty else S.add n (upto (n-1))
-
-let map f s = S.fold (fun x s -> S.add (f x) s) s S.empty
-
-let make_setlist set1 set2 = set1 :: set2 :: []
-
-(** INPUT *)
+(** Input *)
 
 let square = read_int () |> (fun x -> if (x >= 4 && x <= 6) then x else invalid_arg "Board must be either 4x4, 5x5 or 6x6.")
 
@@ -35,39 +27,41 @@ let rec ineq_fun = function
     | 0 -> []
     | n -> ((read_line () |> String.split_on_char ' ' |> List.map int_of_string) |> check_ineq_input) :: ineq_fun (n - 1)
 
-(** se colocarmos um numero num certo quadrado do tabuleiro, a linha e a coluna dessa coordenada ficam indisponiveis. *)
 
-let board = Array.make_matrix square square 0
+(** Solving the problem *) 
 
-let allowedpos_lst = make_setlist (upto (square - 1)) (upto (square - 1))
+let transpose m =
+    let len = Array.length m in
+    if len = 0 then invalid_arg "didnt work" 
+    else 
+    Array.init len (fun i -> Array.init len (fun j -> m.(j).(i)))
 
-(** d1 -> linhas indisponiveis para um certo numero n
-    d2 -> colunas indisponiveis para um certo numero n 
-    let test = make_setlist (S.remove x lin) (S.remove y col) *)
-let rec solve n d1 d2 = function
-    | [lin; col] -> begin
-                    if n > square then true
-                    else
-                        if S.is_empty lin || S.is_empty col then solve (n + 1) S.empty S.empty allowedpos_lst
-                        else
-                            let x = S.min_elt (S.diff lin d1) 
-                            and y = S.min_elt (S.diff col d2) in
-                            let d1 = S.diff lin d1
-                            and d2 = S.diff col d2
-                            in
-                            board.(x).(y) <- n;
-                            solve n d1 d2 allowedpos_lst
-                end
-                    
-    | _ -> assert false
+let rec index_of l n = if l.(n) = 0 then n else index_of l (n+1)
+
+(** true if safe, false if not *)
+let is_safe num lin brd =
+    let index = index_of lin 0 in
+    let brd_tr = transpose brd in
+    not (Array.exists (fun elem -> elem = num) lin
+    || Array.exists (fun elem -> elem = num) brd_tr.(index))
+
+(*let rec brute_force n brd =
+    Array.for_all (fun lin -> Array.for_all () lin) brd*)
 
 let print_board arr = Array.iter (fun y -> Array.iter (Printf.printf "%d ") y; print_newline ()) arr
 
+let board = Array.make_matrix square square 0
+
+let () = board.(0).(1) <- 2; board.(1).(0) <- 2
+
+let () = Printf.printf "%B\n" (is_safe 1 (board.(1)) board)
+
 let ineq_list = inequalities |> ineq_fun
 
-let yes = solve 1 S.empty S.empty (make_setlist (upto (square - 1)) (upto (square - 1)))
+(*let ok = brute_force 1 board (0, 0)*)
 
 let () = print_board board
+
 
 
 
