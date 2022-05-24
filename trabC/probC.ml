@@ -45,20 +45,48 @@ let is_safe num lin brd =
     not (Array.exists (fun elem -> elem = num) lin
     || Array.exists (fun elem -> elem = num) brd_tr.(index))
 
-(*let rec brute_force n brd =
-    Array.for_all (fun lin -> Array.for_all () lin) brd*)
+let rec check_ineqs brd = function
+    | [] -> true
+    | i :: rst -> begin
+                    let aux_check_ineqs = function
+                    | [(a, b); (c, d)] -> if brd.(a).(b) = 0 || brd.(c).(d) = 0 then true
+                                          else brd.(a).(b) > brd.(c).(d)
+                    | _ -> assert false
+                    in
+                    aux_check_ineqs i && check_ineqs brd rst
+                end
+
+
+let rec solve_lin n pos lin brd ineq_lst =
+    if n > square then solve_lin 1 pos lin brd ineq_lst
+    else
+    if pos + 1 > square then true
+    else
+    if is_safe n lin brd 
+    then begin
+        lin.(pos) <- n;
+        if check_ineqs brd ineq_lst then (Printf.printf "test1 %d %d\n" n pos; solve_lin (n + 1) (pos + 1) lin brd ineq_lst)
+        else begin
+            Printf.printf "test2 %d %d\n" n pos;
+            lin.(pos) <- 0;
+            if solve_lin (n + 1) pos lin brd ineq_lst then true else false
+        end
+    end        
+    else
+        (Printf.printf "%d\t" n;
+        solve_lin (n + 1) pos lin brd ineq_lst)
+
+
+let rec brute_force brd ineq_lst =
+    Array.for_all (fun lin -> solve_lin 1 0 lin brd ineq_lst) brd
 
 let print_board arr = Array.iter (fun y -> Array.iter (Printf.printf "%d ") y; print_newline ()) arr
 
 let board = Array.make_matrix square square 0
 
-let () = board.(0).(1) <- 2; board.(1).(0) <- 2
-
-let () = Printf.printf "%B\n" (is_safe 1 (board.(1)) board)
-
 let ineq_list = inequalities |> ineq_fun
 
-(*let ok = brute_force 1 board (0, 0)*)
+let ok = brute_force board ineq_list
 
 let () = print_board board
 
@@ -73,3 +101,20 @@ let () = print_board board
             in
         not (Array.exists (fun a -> a = num) board.(x) || is_safe_col num (square - 1) (x, y))
     end *)
+
+(* let rec solve_lin n pos lin brd ineq_lst =
+    if n > square then solve_lin 1 pos lin brd ineq_lst
+    else
+    if pos + 1 > square then true
+    else
+    if is_safe n lin brd 
+    then begin
+        lin.(pos) <- n;
+        if check_ineqs brd ineq_lst then solve_lin (n + 1) (pos + 1) lin brd ineq_lst
+        else begin
+            lin.(pos) <- 0;
+            solve_lin (n + 1) pos lin brd ineq_lst
+        end
+    end        
+    else
+        solve_lin (n + 1) pos lin brd ineq_lst *)
