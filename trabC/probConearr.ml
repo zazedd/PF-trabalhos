@@ -2,6 +2,9 @@ open Format
 
 (** Input *)
 
+let remove_dups xs = List.fold_left (fun xs x -> if List.mem x xs then xs else x :: xs) [] xs
+
+
 let square = read_int () |> (fun x -> if (x >= 4 && x <= 6) then x else invalid_arg "Board must be either 4x4, 5x5 or 6x6.")
 
 let inequalities = read_int ()
@@ -32,6 +35,8 @@ let rec ineq_fun = function
 
 (** Função remove_in_lst: Remove da lista lst os elementos presentes em rem *)
 let remove_in_lst lst rem = List.fold_left (fun xs x -> if List.mem x rem then xs else x :: xs) [] lst
+
+let ( -!) = remove_in_lst
 
 (** Função count_upto: Cria a lista de números possíveis até square (com o 0)
 *   [0; 1; 2; ... square]                                               
@@ -85,36 +90,49 @@ let rec check_ineq brd (x, y) = function
                 in
                 check_ineq_aux i
             end
+
+(* let rec check_ineq brd (x, y) = function
+    | [] -> []
+    | i :: rest -> begin
+                let rec check_ineq_aux = function
+                | [(a, b); (c, d)] -> if (x, y) = (a, b) then 
+                                      (let bigger = get brd (a, b) and smaller = get brd (c, d) in
+                                        if bigger > smaller || bigger = 0 then [] else count_upto smaller)
+                                      else if (x, y) = (c, d) then
+                                      (let bigger = get brd (a, b) and smaller = get brd (c, d) in
+                                        if bigger > smaller || smaller = 0 then [] else count_from bigger)
+                                      else
+                                        check_ineq brd (x, y) rest
+                | _ -> assert false
+                in
+                check_ineq_aux i
+            end  *)
       
- (* let unavail = get_row brd 0 (x, y) @ get_col brd 0 (x, y) @ check_ineq brd (x, y) ineq_list in *)       
+let print_board brd = Array.iteri (fun i elem -> if (i + 1) mod square <> 0 then Printf.printf "%d " elem else Printf.printf "%d\n" elem) brd
+
+
+(* let unavail = get_row brd 0 (x, y) @ get_col brd 0 (x, y) @ check_ineq brd (x, y) ineq_list in *)       
 let available_numbers brd ineq_list (x, y) =
-    let test1 = get_row brd 0 (x, y) in
-    let test2 = get_col brd 0 (x, y) in
-    let test3 = check_ineq brd (x, y) ineq_list in
-    let unavail  = test1 @ test2 @ test3 in
-    (if (x, y) = (3, 1) then (* List.iter (Printf.printf "%d ") test1; Printf.printf "\n";
-                              List.iter (Printf.printf "%d ") test2; Printf.printf "\n"; *)
-                               (* List.iter (Printf.printf "%d ") test3; Printf.printf "\n"; *)
-                                List.iter (Printf.printf "%d ") unavail; Printf.printf "\n";
-                                Printf.printf "---------\n");
+    let unavail = (get_row brd 0 (x, y)) @ (get_col brd 0 (x, y)) @ (check_ineq brd (x, y) ineq_list) |> remove_dups |> List.fast_sort compare in
+(*     (if (x, y) = (3, 1) then List.iter (Printf.printf "%d ") (check_ineq brd (x, y) ineq_list); Printf.printf "\n"); *)
     let avail = count_upto square in
         (remove_in_lst avail unavail) |> List.fast_sort compare
 
 let rec fill brd ineq_list ((x, y) as pos) =
-    if pos = (square, 0) then Some brd                          (** todas as posições já estão preenchidas *) 
-    else 
-        match available_numbers brd ineq_list pos with
+    (* print_board brd; *)
+    if pos = (square, 0) then Some brd                       (** todas as posições já estão preenchidas *) 
+    else
+        let test = (available_numbers brd ineq_list pos) in
+        match test with
         | [] -> None                                            (** se não houver numeros disponíveis, não há solução nesta branch *)
-        | l -> try_vals brd ineq_list pos l
+        | avail -> try_vals brd ineq_list pos avail
     and try_vals brd ineq_list pos = function
         | [] -> None
-        | v :: l -> begin
-            match fill (board_with_val brd v pos) ineq_list (next pos) with
+        | n :: rest -> begin
+            match fill (board_with_val brd n pos) ineq_list (next pos) with
             | Some _ as res -> res
-            | None -> try_vals brd ineq_list pos l
+            | None -> try_vals brd ineq_list pos rest
             end
-
-let print_board brd = Array.iteri (fun i elem -> if (i + 1) mod square <> 0 then Printf.printf "%d " elem else Printf.printf "%d\n" elem) brd
 
 let solve brd ineq_list = 
     match fill brd ineq_list (0, 0) with
@@ -132,8 +150,10 @@ let board = Array.make (square * square) 0
 let ineq_list = inequalities |> ineq_fun
 
 (* let () = List.iter (Printf.printf "%d ") (check_ineq board (3, 1) ineq_list); Printf.printf "\n"
-let () = List.iter (Printf.printf "%d ") (check_ineq board (3, 1) ineq_list); Printf.printf "\n"
 let () = List.iter (Printf.printf "%d ") (check_ineq board (3, 1) ineq_list); Printf.printf "\n" *)
+(* let () = List.iter (Printf.printf "%d ") (check_ineq board (3, 1) ineq_list); Printf.printf "\n" *)
 
 
 let () = solve board ineq_list
+
+(* let () = List.iter (Printf.printf "%d ") (check_ineq board (3, 1) ineq_list) *)
