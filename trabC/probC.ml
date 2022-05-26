@@ -66,23 +66,18 @@ let board_with_val brd num (x, y) =
     brdcopy.(x * square + y) <- num;
     brdcopy
 
-(** Função get_row: 
-*   Coloca numa lista os elementos da linha correspondente à posição (x, y)
-*   Estes serão os números indisponíveis para qualquer outra casa na mesma linha
+(** Função get_row_col: 
+*   Coloca numa lista os elementos da linha/coluna correspondente à posição (x, y)
+*   Estes serão os números indisponíveis para qualquer outra casa na mesma linha e coluna
+*   
+*   mode = 0 -> linha
+*   mode <> 0 -> coluna
 *)
-let rec get_row brd pos (x, _) = 
+let rec get_row_col brd mode pos (x, y) =
     if pos > square - 1 then []
     else
-        get brd (x, pos) :: get_row brd (pos + 1) (x, 0)
-
-(** Função get_col: 
-*   Coloca numa lista os elementos da coluna correspondente à posição (x, y)
-*   Estes serão os números indisponíveis para qualquer outra casa na mesma coluna
-*)
-let rec get_col brd pos (_, y) = 
-    if pos > square - 1 then []
-    else
-        get brd (pos, y) :: get_col brd (pos + 1) (0, y) 
+        if mode = 0 then get brd (x, pos) :: get_row_col brd mode (pos + 1) (x, 0)
+        else get brd (pos, y) :: get_row_col brd mode (pos + 1) (0, y)
 
 (** Função check_ineq: 
 *   Devolve uma lista com os números indísponiveis para uma casa (x, y) por não verificarem as inequações
@@ -111,7 +106,7 @@ let rec check_ineq brd ((x, y) as pos) = function
 *   Devolve uma lista com os números disponíveis para uma casa (x, y)
 *)
 let available_numbers brd ineqlst ((x, y) as pos) =
-    let unavail = (get_row brd 0 pos) @ (get_col brd 0 pos) @ (check_ineq brd pos ineqlst) in (** todos os números indisponíveis, seja por estarem na mesma coluna. linha, ou não responderem à inequação *)
+    let unavail = (get_row_col brd 0 0 pos) @ (get_row_col brd 1 0 pos) @ (check_ineq brd pos ineqlst) in (** todos os números indisponíveis, seja por estarem na mesma coluna. linha, ou não responderem à inequação *)
     let avail = count_upto square in                            (** todos os números disponíveis, sem nenhumas restrições *)
         remove_in_lst avail unavail                             (** a diferença simétrica dá os números disponíveis para a posição *)
 
