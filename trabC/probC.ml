@@ -154,6 +154,7 @@ let ineqlst = read_int () |> ineq_fun |> sort_ineq_lst
 let () = solve board ineqlst
 
 
+
 (** Exemplo: 
 *
 *   In:
@@ -179,5 +180,7 @@ let () = solve board ineqlst
 *   5 1 4 3 6 2
 *   3 6 5 2 4 1
 *   6 4 2 1 3 5
+*
+*   +- 0.03s na minha máquina
 *
 *)
