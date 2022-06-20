@@ -39,7 +39,7 @@ let sort_ineq_lst lst = List.sort sort_ineq_lst_aux lst
 let remove_in_lst lst rem = List.fold_left (fun xs x -> if List.mem x rem then xs else x :: xs) [] lst
 
 (** Função count_upto: 
-*   Cria uma lista de números ordenados até square (com o 0) -> [0; 1; 2; ... square]                                               
+*   Cria uma lista de números ordenados até square (com o 0) -> [0; 1; 2; ... n]                                               
 *)
 let rec count_upto n = if n < 0 then [] else n :: count_upto (n - 1)
 
